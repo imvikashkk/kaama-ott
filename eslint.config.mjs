@@ -1,0 +1,23 @@
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+  {
+    rules: {
+      // React Compiler false-positives on standard async data-fetch patterns
+      // (fetch functions called from useEffect). Downgrade to warn.
+      'react-compiler/react-compiler': 'warn',
+    },
+  },
+]);
+
+export default eslintConfig;

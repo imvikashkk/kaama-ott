@@ -1,0 +1,131 @@
+{
+  "movies": [
+    {
+      "slug": "besharam",
+      "title": "Besharam",
+      "description": "Na sharm, na parda — ek aurat jo apni khwahishon ko chhupane se inkaar kar deti hai.",
+      "genre": "Drama",
+      "year": "2026",
+      "banner": "https://image-kaamaott.b-cdn.net/besharam-banner.png",
+      "poster": "https://image-kaamaott.b-cdn.net/besharam-poster.png",
+      "thumbnail": "https://image-kaamaott.b-cdn.net/besharam-banner.png",
+      "videoUrl": "https://vz-afdd771c-98c.b-cdn.net/ecf6df0c-5ba8-4336-8111-36307813cd76/playlist.m3u8",
+      "featured": true
+    },
+    {
+      "slug": "cheat",
+      "title": "Cheat",
+      "description": "Ek chhota sa jhooth, ek bada dhokha — jab bharosa toota toh sab kuch bikhar gaya.",
+      "genre": "Thriller",
+      "year": "2025",
+      "banner": "https://image-kaamaott.b-cdn.net/cheat-banner.png",
+      "poster": "https://image-kaamaott.b-cdn.net/cheat-poster.png",
+      "thumbnail": "https://image-kaamaott.b-cdn.net/cheat-banner.png",
+      "videoUrl": "https://vz-afdd771c-98c.b-cdn.net/b169f230-5a41-4c21-83fa-be12c752847c/playlist.m3u8",
+      "featured": true
+    },
+    {
+      "slug": "de-de-pyar-de",
+      "title": "De De Pyar De",
+      "description": "Pyaar maangne se nahi milta, par jab mila toh hadh se zyada mila.",
+      "genre": "Romance",
+      "year": "2026",
+      "banner": "https://image-kaamaott.b-cdn.net/de_de_pyar_de-banner.png",
+      "poster": "https://image-kaamaott.b-cdn.net/de_De_pyar_de-poster.png",
+      "thumbnail": "https://image-kaamaott.b-cdn.net/de_de_pyar_de-banner.png",
+      "videoUrl": "https://vz-afdd771c-98c.b-cdn.net/5e601946-c182-46bc-ba21-7d5ec6514da8/playlist.m3u8",
+      "featured": true
+    },
+    {
+      "slug": "farebi-yaar",
+      "title": "Farebi Yaar",
+      "description": "Jis dost pe sabse zyada bharosa tha, wahi nikla sabse bada farebi.",
+      "genre": "Thriller",
+      "year": "2024",
+      "banner": "https://image-kaamaott.b-cdn.net/farebi_yaar-banner.png",
+      "poster": "https://image-kaamaott.b-cdn.net/farebi_yaar-poster.png",
+      "thumbnail": "https://image-kaamaott.b-cdn.net/farebi_yaar-banner.png",
+      "videoUrl": "https://vz-afdd771c-98c.b-cdn.net/61ed354f-b3f5-499e-9d90-02bdf7234539/playlist.m3u8",
+      "featured": true
+    },
+    {
+      "slug": "gore-gore-gal",
+      "title": "Gore Gore Gal",
+      "description": "Gaon ki gori, sheher ki nazrein — ek khoobsurti jo sabka chain chheen le.",
+      "genre": "Romance",
+      "year": "2026",
+      "banner": "https://image-kaamaott.b-cdn.net/gore_gore_gal-banner.png",
+      "poster": "https://image-kaamaott.b-cdn.net/gore_gore_gal-poster.png",
+      "thumbnail": "https://image-kaamaott.b-cdn.net/gore_gore_gal-banner.png",
+      "videoUrl": "https://vz-afdd771c-98c.b-cdn.net/69b0fc2f-9709-4706-b831-a5e2ab66839d/playlist.m3u8",
+      "featured": true
+    },
+    {
+      "slug": "love-guru",
+      "title": "Love Guru",
+      "description": "Sabko pyaar ke nuskhe dene wala guru — jab khud fasa toh bhool gaya saare gyaan.",
+      "genre": "Comedy",
+      "year": "2022",
+      "banner": "https://image-kaamaott.b-cdn.net/love_guru-banner.png",
+      "poster": "https://image-kaamaott.b-cdn.net/love_guru-poster.png",
+      "thumbnail": "https://image-kaamaott.b-cdn.net/love_guru-banner.png",
+      "videoUrl": "https://vz-afdd771c-98c.b-cdn.net/7c371728-f871-4adb-a004-0cdae89122c9/playlist.m3u8",
+      "featured": true
+    },
+    {
+      "slug": "pati-ya-woh",
+      "title": "Pati Ya Woh",
+      "description": "Ek taraf pati, doosri taraf woh — dil ki ladai mein jeet kiski hogi?",
+      "genre": "Drama",
+      "year": "2026",
+      "banner": "https://image-kaamaott.b-cdn.net/pati_ya_woh-banner.png",
+      "poster": "https://image-kaamaott.b-cdn.net/pati_ya_woh-poster.png",
+      "thumbnail": "https://image-kaamaott.b-cdn.net/pati_ya_woh-banner.png",
+      "videoUrl": "https://vz-afdd771c-98c.b-cdn.net/98c229ba-00c1-4ef3-8b35-207fd12b293b/playlist.m3u8",
+      "featured": true
+    },
+    {
+      "slug": "pyar-ka-parinam",
+      "title": "Pyar Ka Parinam",
+      "description": "Har galti ka ek anjaam hota hai — aur is pyaar ka parinam sabko hila dega.",
+      "genre": "Drama",
+      "year": "2026",
+      "banner": "https://image-kaamaott.b-cdn.net/pyar_ka_parinam-banner.png",
+      "poster": "https://image-kaamaott.b-cdn.net/pyar_ka_parinam-poster.png",
+      "thumbnail": "https://image-kaamaott.b-cdn.net/pyar_ka_parinam-banner.png",
+      "videoUrl": "https://vz-afdd771c-98c.b-cdn.net/800f11cb-06c9-4c97-8cb3-d28af1ef9ad1/playlist.m3u8",
+      "featured": true
+    }
+  ],
+  "series": [],
+  "sections": [
+    {
+      "title": "Trending Now",
+      "subtitle": "Sabse zyada dekhe ja rahe — abhi isi waqt",
+      "slugs": [
+        "besharam",
+        "cheat",
+        "de-de-pyar-de",
+        "farebi-yaar",
+        "gore-gore-gal",
+        "love-guru",
+        "pati-ya-woh",
+        "pyar-ka-parinam"
+      ]
+    },
+    {
+      "title": "Late Night Specials",
+      "subtitle": "Jab sab so jaayein, tab dekhne waali kahaniyan",
+      "slugs": [
+        "pyar-ka-parinam",
+        "pati-ya-woh",
+        "love-guru",
+        "gore-gore-gal",
+        "farebi-yaar",
+        "de-de-pyar-de",
+        "cheat",
+        "besharam"
+      ]
+    }
+  ]
+}
