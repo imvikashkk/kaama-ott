@@ -4,6 +4,8 @@ import { activateSubscription } from './activateSubscription';
 import { getUpiOrderStatus } from './upiGateway';
 
 const INTERVAL_MS = 5000;
+// Gateway status queries in flight at once
+const CONCURRENCY = 10;
 // Orders older than this are no longer polled — UPI QR links expire well before it
 const WINDOW = '1 hour';
 // Still pending this long after the QR expiry → give up and mark failed
@@ -51,25 +53,31 @@ async function tick() {
      WHERE status = 'pending' AND created_at > NOW() - INTERVAL '${WINDOW}'`,
   );
 
-  for (const row of res.rows) {
-    try {
-      const { state } = await settleUpiOrder(row.txn_id, Number(row.amount), null);
-      if (state !== 'pending') {
-        console.log(`payment watcher: ${row.txn_id} → ${state}`);
-        continue;
-      }
+  // Check orders in parallel batches — one at a time, a backlog of abandoned QRs would delay a real payment
+  for (let i = 0; i < res.rows.length; i += CONCURRENCY) {
+    await Promise.all(res.rows.slice(i, i + CONCURRENCY).map(checkRow));
+  }
+}
 
-      const expiresAt = row.expires_at ? new Date(row.expires_at).getTime() : NaN;
-      if (!Number.isNaN(expiresAt) && Date.now() > expiresAt + EXPIRY_GRACE_MS) {
-        await pool.query(
-          `UPDATE payments SET status='failed', updated_at=NOW() WHERE txn_id=$1 AND status='pending'`,
-          [row.txn_id],
-        );
-        console.log(`payment watcher: ${row.txn_id} → expired`);
-      }
-    } catch (err) {
-      console.error('payment watcher error:', row.txn_id, err);
+async function checkRow(row: { txn_id: string; amount: string; created_at: Date; expires_at: string | null }) {
+  try {
+    const { state } = await settleUpiOrder(row.txn_id, Number(row.amount), null);
+    if (state !== 'pending') {
+      const secs = Math.round((Date.now() - new Date(row.created_at).getTime()) / 1000);
+      console.log(`payment watcher: ${row.txn_id} → ${state} (${secs}s after order)`);
+      return;
     }
+
+    const expiresAt = row.expires_at ? new Date(row.expires_at).getTime() : NaN;
+    if (!Number.isNaN(expiresAt) && Date.now() > expiresAt + EXPIRY_GRACE_MS) {
+      await pool.query(
+        `UPDATE payments SET status='failed', updated_at=NOW() WHERE txn_id=$1 AND status='pending'`,
+        [row.txn_id],
+      );
+      console.log(`payment watcher: ${row.txn_id} → expired`);
+    }
+  } catch (err) {
+    console.error('payment watcher error:', row.txn_id, err);
   }
 }
 
