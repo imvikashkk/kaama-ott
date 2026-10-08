@@ -116,7 +116,7 @@ export async function activateSubscription(
 
     const updateRes = await client.query(
       `UPDATE payments SET status='success', gateway_txn_id=$1, gateway_response=$2, updated_at=NOW()
-       WHERE txn_id=$3 AND status='pending'
+       WHERE txn_id=$3 AND status IN ('pending','failed')
        RETURNING id`,
       [gatewayTxnId, JSON.stringify(rawData), txnId],
     );

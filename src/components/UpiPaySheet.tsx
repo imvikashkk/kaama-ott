@@ -15,12 +15,23 @@ interface OrderInfo {
 
 const POLL_MS = 3000;
 
-// PhonePe rejects this merchant's intent links (tap-to-pay) but accepts the same order QR when scanned,
-// so payment is QR-only: scanned from another screen, or saved and picked from the gallery inside PhonePe.
-// The order id travels in the QR's `tr`, so a scanned payment is still auto-verified.
-const PHONEPE_ICON = '/upi/phonepe.png';
+// Tap-to-pay app buttons. Android opens the exact app through an intent:// URL with its package;
+// iOS has no intent URLs, so each app's own scheme is used. The order id travels in the link's `tr`,
+// so a payment from any app is still auto-verified.
+const UPI_APPS = [
+  { name: 'PhonePe', icon: '/upi/phonepe.png', pkg: 'com.phonepe.app', ios: 'phonepe://pay' },
+  { name: 'GPay', icon: '/upi/gpay.png', pkg: 'com.google.android.apps.nbu.paisa.user', ios: 'gpay://upi/pay' },
+  { name: 'Paytm', icon: '/upi/paytm.png', pkg: 'net.one97.paytm', ios: 'paytmmp://pay' },
+  { name: 'BHIM', icon: '/upi/bhim.png', pkg: 'in.org.npci.upiapp', ios: 'bhim://upi/pay' },
+];
 
 const isMobile = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+const isAndroid = () => /Android/i.test(navigator.userAgent);
+
+function appLink(upiLink: string, app: (typeof UPI_APPS)[number], android: boolean) {
+  const query = upiLink.slice(upiLink.indexOf('?') + 1);
+  return android ? `intent://pay?${query}#Intent;scheme=upi;package=${app.pkg};end` : `${app.ios}?${query}`;
+}
 
 function formatLeft(ms: number) {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -35,6 +46,7 @@ export default function UpiPaySheet({ txnId, onClose }: { txnId: string; onClose
   const [order, setOrder] = useState<OrderInfo | null>(null);
   const [left, setLeft] = useState<number | null>(null);
   const [mobile, setMobile] = useState(true);
+  const [android, setAndroid] = useState(true);
   const doneRef = useRef(false);
   const busyRef = useRef(false);
 
@@ -138,6 +150,7 @@ export default function UpiPaySheet({ txnId, onClose }: { txnId: string; onClose
 
   useEffect(() => {
     setMobile(isMobile());
+    setAndroid(isAndroid());
   }, []);
 
   // Lock background scroll while open
@@ -209,37 +222,70 @@ export default function UpiPaySheet({ txnId, onClose }: { txnId: string; onClose
 
             <div className="my-4" style={{ borderTop: `2px dashed ${LINE}` }} />
 
-            <p className="m-0 mb-3 flex items-center justify-center gap-2 text-[13px] font-bold text-white">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={PHONEPE_ICON} alt="" className="w-5 h-5 rounded-sm bg-white object-contain" />
-              Only PhonePe supported
-            </p>
+            {mobile && (
+              <div className="mb-5">
+                <p className="m-0 mb-3 text-center text-[13px] font-bold text-white">UPI app chuno</p>
+                <div className="grid grid-cols-5 gap-2">
+                  {UPI_APPS.map((app) => (
+                    <a
+                      key={app.name}
+                      href={appLink(order.upiLink, app, android)}
+                      className="flex flex-col items-center gap-1.5 rounded-md py-2.5 no-underline transition-transform active:scale-95"
+                      style={{ background: 'rgba(245,239,230,.06)', border: `1px solid ${LINE}` }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={app.icon} alt="" className="w-9 h-9 rounded-md bg-white object-contain p-0.5" />
+                      <span className="text-[10px] font-semibold text-white/80">{app.name}</span>
+                    </a>
+                  ))}
+                  {/* Plain upi:// lets the phone offer every installed UPI app */}
+                  <a
+                    href={order.upiLink}
+                    className="flex flex-col items-center gap-1.5 rounded-md py-2.5 no-underline transition-transform active:scale-95"
+                    style={{ background: 'rgba(245,239,230,.06)', border: `1px solid ${LINE}` }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/upi/upi-other.jpg" alt="" className="w-9 h-9 rounded-md bg-white object-contain p-0.5" />
+                    <span className="text-[10px] font-semibold text-white/80">Other</span>
+                  </a>
+                </div>
+              </div>
+            )}
 
             {order.qrCode && (
               <div className="flex flex-col items-center mb-5">
+                {mobile && <p className="m-0 mb-3 text-[12px] text-white/45">ya QR se pay karo</p>}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={order.qrCode} alt="UPI QR" className="w-52 h-52 rounded-sm bg-white p-1.5" />
+                <img src={order.qrCode} alt="UPI QR" className={`${mobile ? 'w-40 h-40' : 'w-52 h-52'} rounded-sm bg-white p-1.5`} />
                 {mobile ? (
                   <>
                     <a
                       href={order.qrCode}
                       download={`kaama-pay-${order.amount}.png`}
-                      className="flex items-center justify-center gap-2 w-full h-14 mt-4 rounded-md text-[15px] font-extrabold no-underline transition-transform active:scale-[.98]"
-                      style={{ background: YELLOW, color: INK, boxShadow: `4px 4px 0 ${RED}` }}
+                      className="flex items-center justify-center gap-2 w-full h-11 mt-3 rounded-md text-[13px] font-bold no-underline transition-transform active:scale-[.98]"
+                      style={{ background: 'transparent', color: YELLOW, border: `1px solid ${YELLOW}` }}
                     >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 3v12" />
                         <polyline points="7,10 12,15 17,10" />
                         <path d="M5 21h14" />
                       </svg>
                       QR save karo
                     </a>
-                    <p className="m-0 mt-3 text-center text-[12px] leading-relaxed text-white/60">
-                      PhonePe kholo → <span className="text-white font-semibold">Scan</span> → <span className="text-white font-semibold">Gallery</span> se ye QR chuno
+                    <p className="m-0 mt-2 text-center text-[11px] leading-relaxed text-white/50">
+                      UPI app → <span className="text-white/80 font-semibold">Scan</span> → <span className="text-white/80 font-semibold">Gallery</span> se ye QR chuno
                     </p>
                   </>
                 ) : (
-                  <p className="m-0 mt-2 text-[12px] text-white/60">PhonePe se scan karo</p>
+                  <>
+                    <p className="m-0 mt-3 text-[12px] text-white/60">Kisi bhi UPI app se scan karo</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      {UPI_APPS.map((app) => (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img key={app.name} src={app.icon} alt={app.name} title={app.name} className="w-7 h-7 rounded-md bg-white object-contain p-0.5" />
+                      ))}
+                    </div>
+                  </>
                 )}
               </div>
             )}

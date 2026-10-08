@@ -6,17 +6,23 @@ import { settleUpiOrder } from '@/lib/paymentWatcher';
 // It is unsigned, so it's only a nudge — settleUpiOrder re-checks the order via the gateway's query API
 async function handle(params: URLSearchParams) {
   try {
-    const txnId = params.get('txnid') ?? params.get('apitxnid');
-    if (!txnId) return new NextResponse('OK');
+    // Our id comes back as `apitxnid` (txnid is the gateway's own) — match any of them, plus the create-time upi_tr
+    const ids = ['apitxnid', 'txnid', 'payid'].map((k) => params.get(k)).filter((v): v is string => !!v);
+    if (ids.length === 0) return new NextResponse('OK');
 
-    const payRes = await pool.query(`SELECT txn_id, amount, status FROM payments WHERE txn_id = $1`, [txnId]);
+    const payRes = await pool.query(
+      `SELECT txn_id, amount, status FROM payments WHERE txn_id = ANY($1) OR cf_order_id = ANY($1) LIMIT 1`,
+      [ids],
+    );
     const pay = payRes.rows[0];
     if (!pay) {
-      console.error('payment callback: unknown txn', txnId);
+      console.error('payment callback: unknown txn', ids.join(','));
       return new NextResponse('OK');
     }
 
-    if (pay.status === 'pending') {
+    // A 'failed' order is re-checked too — the watcher expires unpaid orders after ~20 min,
+    // but a late bank confirmation must still activate the subscription
+    if (pay.status !== 'success') {
       const { state } = await settleUpiOrder(pay.txn_id, Number(pay.amount), null);
       console.log(`payment callback: ${pay.txn_id} (${params.get('status')}) → ${state}`);
     }
