@@ -12,7 +12,7 @@ CREATE INDEX IF NOT EXISTS idx_pay_pending ON payments(created_at) WHERE status 
 INSERT INTO plans (name, original_price, price, duration_days, description)
 SELECT v.name, v.original_price, v.price, v.duration_days, v.description
 FROM (VALUES
-  ('1 Day',    299,  179, 1,   'Ek din ka full access'),
+  ('1 Day',    299,  169, 1,   'Ek din ka full access'),
   ('1 Month',  499,  249, 30,  'Poora mahine ka mazza'),
   ('6 Months', 999,  399, 180, 'Chhe mahine ka full entertainment'),
   ('1 Year',   1499, 599, 365, 'Poore saal ka unlimited mazza')
@@ -23,7 +23,7 @@ WHERE NOT EXISTS (
 );
 
 UPDATE plans SET is_active = (name, price, duration_days) IN (
-  ('1 Day', 179, 1), ('1 Month', 249, 30), ('6 Months', 399, 180), ('1 Year', 599, 365)
+  ('1 Day', 169, 1), ('1 Month', 249, 30), ('6 Months', 399, 180), ('1 Year', 599, 365)
 );
 
 COMMIT;

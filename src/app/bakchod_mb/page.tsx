@@ -25,7 +25,7 @@ interface PayStats { total: string; successful: string; pending: string; failed:
 interface MktOverview { total_purchases: string; capi_sent: string; capi_issues: string }
 interface PixelStat   { id: number; slug: string; label: string; pixel_id: string; ad_account_id: string | null; purchases: string; capi_sent: string; capi_issues: string }
 interface MetaStat    { meta_campaign_id: string; meta_campaign_name: string | null; campaign_slug: string | null; pixel_label: string | null; pixel_id: string | null; ad_account_id: string | null; purchases: string; capi_sent: string; capi_issues: string }
-interface Pixel       { id: number; slug: string; label: string; pixel_id: string; ad_account_id: string | null; is_default: boolean }
+interface Pixel       { id: number; slug: string; label: string; pixel_id: string; access_token: string; ad_account_id: string | null; is_default: boolean }
 
 const MB_NAV: { key: MainTab; label: string; icon: string }[] = [
   { key: 'payments',  label: 'Payments',  icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
@@ -689,7 +689,7 @@ export default function MBDashboard() {
                                     ? <><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg> Copied!</>
                                     : <><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg> Copy</>}
                                 </button>
-                                <button onClick={() => { setEditPx(px); setPxForm({ slug: px.slug, label: px.label, pixel_id: px.pixel_id, access_token: '', ad_account_id: px.ad_account_id ?? '' }); setShowToken(false); setShowPxForm(true); }}
+                                <button onClick={() => { setEditPx(px); setPxForm({ slug: px.slug, label: px.label, pixel_id: px.pixel_id, access_token: px.access_token ?? '', ad_account_id: px.ad_account_id ?? '' }); setShowToken(false); setShowPxForm(true); }}
                                   className="px-2.5 py-1.5 rounded-[7px] text-[10px] font-bold text-stone-600 hover:bg-stone-100 transition-colors"
                                   style={{ border: '1.5px solid #E6E0D6' }}>Edit</button>
                                 <button onClick={() => setDeleteConfirm(px.id)}

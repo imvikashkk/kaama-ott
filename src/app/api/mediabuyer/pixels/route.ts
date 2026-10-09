@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
   try {
     const [rows, cnt] = await Promise.all([
       pool.query(
-        `SELECT id, slug, label, pixel_id, ad_account_id, is_default FROM pixels WHERE client_id = $1${extra} ORDER BY created_at DESC LIMIT ${LIMIT} OFFSET ${offset}`,
+        `SELECT id, slug, label, pixel_id, access_token, ad_account_id, is_default FROM pixels WHERE client_id = $1${extra} ORDER BY created_at DESC LIMIT ${LIMIT} OFFSET ${offset}`,
         qp,
       ),
       pool.query(`SELECT COUNT(*) FROM pixels WHERE client_id = $1${extra}`, qp),

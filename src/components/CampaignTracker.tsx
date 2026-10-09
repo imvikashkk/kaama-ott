@@ -1,12 +1,46 @@
 'use client';
 
 import { useEffect } from 'react';
-import Script from 'next/script';
 
 declare global {
   interface Window {
     fbq: ((...args: unknown[]) => void) & { callMethod?: (...args: unknown[]) => void; queue: unknown[]; loaded: boolean; version: string; push: (...args: unknown[]) => void };
     _fbq: unknown;
+  }
+}
+
+// Meta pixel base code — defines the fbq queue synchronously, so init below never races the script load
+function loadPixelBase() {
+  if (typeof window.fbq === 'function') return;
+  const n = function (...args: unknown[]) {
+    if (n.callMethod) n.callMethod(...args);
+    else n.queue.push(args);
+  } as Window['fbq'];
+  window.fbq = n;
+  if (!window._fbq) window._fbq = n;
+  n.push = n;
+  n.loaded = true;
+  n.version = '2.0';
+  n.queue = [];
+  const t = document.createElement('script');
+  t.async = true;
+  t.src = 'https://connect.facebook.net/en_US/fbevents.js';
+  document.head.appendChild(t);
+}
+
+function getCookie(name: string) {
+  return document.cookie.split('; ').find((r) => r.startsWith(name + '='))?.split('=')[1] ?? '';
+}
+
+// Set _fbp/_fbc in Meta's own format when the pixel hasn't (ad blocker, slow script) — CAPI reads them
+// server-side to match purchases to the ad click. fbevents.js reuses these cookies if present.
+function ensureFbCookies(fbclid: string | null) {
+  const opts = `; path=/; max-age=${60 * 60 * 24 * 90}; SameSite=Lax`;
+  if (!getCookie('_fbp')) {
+    document.cookie = `_fbp=fb.1.${Date.now()}.${Math.floor(Math.random() * 1e10)}${opts}`;
+  }
+  if (fbclid && !getCookie('_fbc').endsWith(`.${fbclid}`)) {
+    document.cookie = `_fbc=fb.1.${Date.now()}.${fbclid}${opts}`;
   }
 }
 
@@ -27,10 +61,13 @@ export default function CampaignTracker() {
     const campaignSlug = slug || localStorage.getItem('mr_campaign') || '';
     if (!campaignSlug) return;
 
+    ensureFbCookies(params.get('fbclid'));
+    loadPixelBase();
+
     fetch(`/api/pixel-config?c=${encodeURIComponent(campaignSlug)}`)
       .then((r) => r.json())
       .then(({ pixelId }: { pixelId: string | null }) => {
-        if (!pixelId || typeof window.fbq !== 'function') return;
+        if (!pixelId) return;
         // Only init once per session — fbq queues events until init, so re-init causes duplicate sends
         if ((window as any).__mr_pixel_inited === pixelId) return;
         (window as any).__mr_pixel_inited = pixelId;
@@ -40,13 +77,5 @@ export default function CampaignTracker() {
       .catch(() => {});
   }, []);
 
-  return (
-    <Script id="meta-pixel-base" strategy="afterInteractive">{`
-      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-      n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
-      (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    `}</Script>
-  );
+  return null;
 }
